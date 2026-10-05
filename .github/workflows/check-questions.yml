@@ -1,0 +1,17 @@
+name: Check questions
+
+on:
+  push:
+    paths: ["public/questions/**", "scripts/check_questions.py"]
+  pull_request:
+    paths: ["public/questions/**", "scripts/check_questions.py"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/check_questions.py

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brainy Blast Trivia</title>
+<meta name="description" content="Fun trivia and practice quizzes for UK school children, from Year 1 to GCSE: Maths, English, Science, Tech Skills and General Knowledge.">
+<meta name="theme-color" content="#8FD3FF">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Andika:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <header class="topbar">
+    <button class="logo" id="homeLink" aria-label="Brainy Blast home">
+      <span class="logo-badge" aria-hidden="true">🧠</span>
+      Brainy Blast
+    </button>
+    <span class="spacer"></span>
+    <button class="me-chip" id="meChip" aria-label="Switch or edit player" hidden></button>
+    <div class="toggles">
+      <button class="pill-btn" id="soundBtn" aria-pressed="true" aria-label="Sounds"><span id="soundIcon">🔔</span> <span class="lbl">Sounds</span></button>
+      <button class="pill-btn" id="voiceBtn" aria-pressed="false" aria-label="Read to me">🗣️ <span class="lbl">Read to me</span></button>
+    </div>
+  </header>
+
+  <nav class="nav" id="nav" aria-label="Main">
+    <button data-tab="play" aria-current="page">🎮 Play</button>
+    <button data-tab="rewards">🏅 Rewards</button>
+    <button data-tab="board">🏆 Leaderboard</button>
+    <button data-tab="report">📊 Report card</button>
+  </nav>
+
+  <!-- PLAY -->
+  <main id="play">
+    <section class="panel hello" id="hello"></section>
+
+    <h2 class="section-label">Which school year?</h2>
+    <div class="stages" id="stages" role="group" aria-label="School year"></div>
+
+    <div class="two-col">
+      <div>
+        <h2 class="section-label">Choose a subject</h2>
+        <div class="grid" id="tiles"></div>
+      </div>
+      <aside>
+        <h2 class="section-label">This week’s top players</h2>
+        <div class="panel">
+          <ol class="board-list" id="miniBoard"></ol>
+          <p style="margin:14px 0 0"><button class="link" id="seeBoard">See the full leaderboard →</button></p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- REWARDS -->
+  <main id="rewards" hidden>
+    <h2 class="section-label">Your rank</h2>
+    <div class="ranks" id="ranks"></div>
+    <h2 class="section-label">Badge collection <span class="muted" id="badgeCount"></span></h2>
+    <div class="badges" id="badges"></div>
+    <h2 class="section-label">Prize shop <span class="muted" id="shopCoins"></span></h2>
+    <p class="muted" style="margin-top:-6px">Spend the coins you win on new characters and shiny frames.</p>
+    <div class="shop" id="shop"></div>
+  </main>
+
+  <!-- LEADERBOARD -->
+  <main id="board" hidden>
+    <h2 class="section-label">Leaderboard</h2>
+    <div class="panel">
+      <div class="board-tools">
+        <div class="seg" role="group" aria-label="Time period">
+          <button id="bWeek" aria-pressed="true">This week</button>
+          <button id="bAll" aria-pressed="false">All time</button>
+        </div>
+        <label class="sr" for="bStage">School year</label>
+        <select id="bStage"></select>
+      </div>
+      <ol class="board-list" id="bigBoard"></ol>
+      <p class="notice" id="boardNote" hidden></p>
+    </div>
+  </main>
+
+  <!-- REPORT CARD -->
+  <main id="report" hidden>
+    <h2 class="section-label">Report card</h2>
+    <p class="muted" style="margin-top:-6px">Practice grades use the same words as UK school reports. Keep playing to improve them.</p>
+    <div class="report" id="reportGrid"></div>
+  </main>
+
+  <!-- GAME -->
+  <main id="game" hidden>
+    <div class="game-head">
+      <button class="pill-btn" id="quitBtn">← Quit</button>
+      <span class="chip cat" id="catChip"></span>
+      <span class="chip" id="stageChip"></span>
+      <span class="spacer"></span>
+      <span class="chip xp" id="xpChip" aria-live="polite">+0 XP</span>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <section class="qcard">
+      <div class="q-top">
+        <span id="qNum"></span>
+        <span class="hearts" id="hearts" aria-label="Tries left"></span>
+      </div>
+      <div class="q-row">
+        <h2 class="q-text" id="qText"></h2>
+        <button class="speak" id="speakBtn" aria-label="Read the question out loud">🔊</button>
+      </div>
+      <div class="answers" id="answers"></div>
+      <form class="typed" id="typed" hidden autocomplete="off">
+        <label class="sr" for="typedInput">Your answer</label>
+        <input id="typedInput" type="text" placeholder="Type your answer">
+        <button class="big-btn go" id="checkBtn">Check</button>
+      </form>
+      <div class="guesses" id="guesses"></div>
+      <div class="nudge" id="nudge" aria-live="polite"></div>
+      <div class="feedback" id="feedback" hidden>
+        <div class="fb-face" id="fbFace" aria-hidden="true"></div>
+        <div class="fb-body">
+          <p class="fb-title" id="fbTitle"></p>
+          <p class="fb-gain" id="fbGain"></p>
+          <p class="fb-fact" id="fbFact"></p>
+        </div>
+        <button class="big-btn" id="nextBtn">Next →</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- RESULTS -->
+  <main id="results" class="results" hidden>
+    <section class="panel">
+      <div class="trophy-stars" id="trophy" aria-hidden="true"></div>
+      <h2 id="resTitle"></h2>
+      <div class="grade-pill" id="resGrade"></div>
+      <div class="tally" id="tally"></div>
+      <div class="levelup" id="levelUp" hidden></div>
+      <ul class="bonus-list" id="bonusList"></ul>
+      <div class="new-badges" id="newBadges"></div>
+      <div class="actions">
+        <button class="big-btn" id="againBtn">Play again</button>
+        <button class="big-btn alt" id="menuBtn">Choose a subject</button>
+        <button class="big-btn alt" id="toBoardBtn">🏆 Leaderboard</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="foot">Brainy Blast · Practice for Years 1 to 11 in the UK · <span id="qCount">Maths questions are made fresh every round</span></p>
+</div>
+
+<!-- Player card (first visit, add player, edit) -->
+<div class="overlay" id="onboard" hidden role="dialog" aria-modal="true" aria-labelledby="obTitle">
+  <form class="sheet" id="obForm" novalidate>
+    <h2 id="obTitle">Welcome to Brainy Blast!</h2>
+    <p class="muted" id="obSub" style="margin:0">Let’s make your player card.</p>
+
+    <label for="obName">Your name or nickname</label>
+    <input type="text" id="obName" maxlength="16" autocomplete="off" placeholder="e.g. Captain Quiz">
+
+    <label for="obYear">Your school year</label>
+    <select id="obYear"></select>
+
+    <fieldset>
+      <legend>Pick your picture</legend>
+      <div class="av-pick" id="obAvatars"></div>
+      <div class="photo-row">
+        <span id="obPreview"></span>
+        <label class="pill-btn" for="obPhoto" tabindex="0">📷 Upload a photo</label>
+        <input type="file" id="obPhoto" accept="image/*" class="sr">
+        <button type="button" class="link" id="obPhotoClear" hidden>Remove photo</button>
+      </div>
+      <label class="check" id="obPublicRow" hidden>
+        <input type="checkbox" id="obPublic">
+        <span>A grown-up says it’s OK to show this photo on the public leaderboard. If this isn’t ticked, the photo stays on this device and the leaderboard shows a cartoon character instead.</span>
+      </label>
+    </fieldset>
+
+    <p class="note">Grown-ups: the nickname, cartoon character, school year and points appear on a leaderboard that anyone using Brainy Blast can see. Please use a nickname, not a full name.</p>
+    <p class="err" id="obErr" hidden></p>
+    <div class="row">
+      <button type="button" class="link danger" id="obRemove" hidden>Remove this player</button>
+      <span class="spacer"></span>
+      <button type="button" class="big-btn alt" id="obCancel" hidden>Cancel</button>
+      <button class="big-btn go" id="obSubmit">Let’s go! 🚀</button>
+    </div>
+  </form>
+</div>
+
+<!-- Who's playing -->
+<div class="overlay" id="who" hidden role="dialog" aria-modal="true" aria-labelledby="whoTitle">
+  <div class="sheet">
+    <h2 id="whoTitle">Who’s playing?</h2>
+    <div class="who-list" id="whoList"></div>
+    <div class="row">
+      <button class="big-btn alt" id="whoAdd">+ Add a player</button>
+      <button class="big-btn alt" id="whoEdit">✏️ Edit my card</button>
+      <button class="big-btn" id="whoClose">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
